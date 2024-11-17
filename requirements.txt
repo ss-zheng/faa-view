@@ -1,4 +1,0 @@
-streamlit==1.40.1
-geopy==2.4.1
-gcsfs==2024.10.0
-st-files-connection
