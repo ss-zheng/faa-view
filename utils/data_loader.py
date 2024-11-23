@@ -3,7 +3,7 @@ import streamlit as st
 from st_files_connection import FilesConnection
 import os
 
-def load_df(filename, usecols):
+def load_df(filename, usecols=None):
     try:
         if os.path.isdir("data"):
             file_path = os.path.join("data/ReleasableAircraft", filename)
