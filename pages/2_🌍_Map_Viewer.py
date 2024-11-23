@@ -50,7 +50,7 @@ st.set_page_config(page_title="Map Viewer", page_icon="🌍")
 st.markdown("# Map Viewer")
 st.sidebar.header("Map Viewer")
 
-master_df = load_df(MASTER_FILE, usecols=['TYPE REGISTRANT', 'TYPE AIRCRAFT', 'LONGITUDE', 'LATITUDE'])
+master_df = load_df(MASTER_FILE, usecols=['N-NUMBER', 'YEAR MFR', 'TYPE REGISTRANT', 'TYPE AIRCRAFT', 'LONGITUDE', 'LATITUDE'])
 
 # extract ownership
 master_df['Ownership'] = pd.to_numeric(master_df['TYPE REGISTRANT'], errors='coerce')
@@ -61,7 +61,7 @@ master_df['OwnershipColor'] = master_df['Ownership'].map(lambda x: OwnershipType
 master_df['AircraftType'] = pd.to_numeric(master_df['TYPE AIRCRAFT'], errors='coerce')
 master_df['AircraftType'] = master_df['AircraftType'].map(lambda x: AircraftType(x).name if pd.notna(x) else 'UNKNOWN')
 
-hex_radius = st.sidebar.slider('Hexagon Radius', min_value=2000, max_value=100000, value=20000, step=1000)
+# hex_radius = st.sidebar.slider('Hexagon Radius', min_value=2000, max_value=100000, value=20000, step=1000)
 scatter_radius = st.sidebar.slider('Scatter Radius', min_value=2000, max_value=500000, value=100000, step=1000)
 ALL_LAYERS = {
     # "Hexagon": pdk.Layer(
