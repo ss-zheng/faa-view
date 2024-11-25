@@ -5,7 +5,11 @@ import numpy as np
 from utils.data_loader import load_df
 import os
 
-st.set_page_config(page_title="Dataframe Demo", page_icon="📊")
+st.set_page_config(
+    page_title="Dataframe Viewer",
+    page_icon="📊",
+    layout="wide"
+    )
 
 st.markdown("# Dataframe Viewer")
 st.sidebar.header("Dataframe Viewer")

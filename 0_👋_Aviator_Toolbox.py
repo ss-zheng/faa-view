@@ -5,14 +5,14 @@ from utils.data_loader import load_df
 import os
 
 st.set_page_config(
-    page_title="FAA Viewer",
+    page_title="Aviator Toolbox",
     page_icon="👋",
 )
 
-st.markdown("# Welcome to FAA Viewer! 👋")
+st.markdown("# Welcome to Aviator Toolbox! 👋")
 st.markdown(
     """
-    Here is a collection of tools for visualizing FAA data.
+    Here is a collection of tools for aviators.
     
     Data [source](https://www.faa.gov/licenses_certificates/aircraft_certification/aircraft_registry/releasable_aircraft_download)
 

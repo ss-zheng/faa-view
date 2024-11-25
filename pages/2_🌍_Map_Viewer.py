@@ -45,7 +45,11 @@ class AircraftType(Enum):
     HYBRID_LIFT = "H"
     OTHER = "O"
 
-st.set_page_config(page_title="Map Viewer", page_icon="🌍")
+st.set_page_config(
+    page_title="Map Viewer",
+    page_icon="🌍",
+    layout="wide"
+    )
 
 st.markdown("# Map Viewer")
 st.sidebar.header("Map Viewer")
