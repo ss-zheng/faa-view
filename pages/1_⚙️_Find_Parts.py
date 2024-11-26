@@ -1,8 +1,8 @@
 import streamlit as st
+import streamlit.components.v1 as components
 from google.oauth2 import service_account
 from google.cloud import bigquery
 from utils.aviation_se import google_search, display_response
-from utils.filter_df import filter_dataframe
 
 st.set_page_config(
     page_title="Parts Finder",
@@ -53,6 +53,7 @@ old_table = st.sidebar.selectbox(
 )
 
 st.sidebar.markdown("[Search Parts](#search-parts)")
+st.sidebar.markdown("[Third-Party Search](#third-party-search)")
 
 query_template = """
 SELECT 
@@ -161,16 +162,31 @@ WHERE LOWER(title) LIKE '%{search_input}%'
 OR LOWER('{search_input}') IN UNNEST(ARRAY(SELECT LOWER(part_number) FROM UNNEST(part_number) AS part_number))
 """
 if search_input:
-    query = query_template.format(table_id=new_table, search_input=search_input)
-    # st.write(query)
-    ui_df = run_query(query, output_type="dataframe")
-    st_ui_df(ui_df, expander_title="Stats", key="search_ui_pills", meta=query)
+    tab1, tab2, tab3 = st.tabs(["Inventory", "Google", "Ebay"])
 
-if "search_page" not in st.session_state:
-    st.session_state.search_page = 1
+    with tab1:
+        query = query_template.format(table_id=new_table, search_input=search_input)
+        # st.write(query)
+        ui_df = run_query(query, output_type="dataframe")
+        st_ui_df(ui_df, expander_title="Stats", key="search_ui_pills", meta=query)
+    
+    with tab2:
+        if "search_page" not in st.session_state:
+            st.session_state.search_page = 1
 
-# if 'response' not in st.session_state:
-#     st.session_state.response = {}
-# response = search(search_input)
-response = google_search(search_input, page=st.session_state.search_page)
-display_response(response)
+        # if 'response' not in st.session_state:
+        #     st.session_state.response = {}
+        # response = search(search_input)
+        response = google_search(search_input, page=st.session_state.search_page)
+        display_response(response)
+    
+    with tab3:
+        # ebay quick search, this link jump directly to the right ebay category
+        ebay_aviation_url = f"https://www.ebay.com/sch/26435/i.html?_from=R40&_nkw={search_input}"
+        st.link_button("Jump to Ebay", ebay_aviation_url)
+
+
+st.markdown("## Third-Party Search")
+base_url = "https://www.stockmarket.aero/"
+iframe_src = base_url
+components.iframe(iframe_src, height=500, scrolling=True)
