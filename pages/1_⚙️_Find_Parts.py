@@ -1,43 +1,17 @@
 import streamlit as st
 import streamlit.components.v1 as components
-from google.oauth2 import service_account
-from google.cloud import bigquery
 from utils.aviation_se import google_search, display_response
+from utils.data_loader import run_query, list_tables
+from components.header import header
 
 st.set_page_config(
     page_title="Parts Finder",
     page_icon="⚙️",
     layout="wide"
 )
+header()
 
 st.markdown("# Find Parts ⚙️")
-# Create API client.
-credentials = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"]
-)
-client = bigquery.Client(credentials=credentials)
-
-# Perform query.
-# Uses st.cache_data to only rerun when the query changes or after 10 min.
-@st.cache_data(ttl=600)
-def run_query(query, output_type="dataframe"):
-    query_job = client.query(query)
-    if output_type == "dataframe":
-        df = query_job.to_dataframe()
-        return df
-    
-    if output_type == "rows":
-        rows_raw = query_job.result()
-        # Convert to list of dicts. Required for st.cache_data to hash the return value.
-        rows = [dict(row) for row in rows_raw]
-        return rows
-
-@st.cache_data(ttl=600)
-def list_tables():
-    dataset_ref = client.dataset("parts", project="agentfocus")
-    tables = client.list_tables(dataset_ref)
-    table_ids = [table.table_id for table in tables]
-    return table_ids[::-1]
 
 st.sidebar.markdown("[New Parts Today](#new-parts-today)")
 ui_tables = list_tables()

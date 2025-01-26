@@ -1,13 +1,18 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
-from utils.data_loader import load_df
-import os
+from components.header import header
 
 st.set_page_config(
     page_title="Aviator Toolbox",
     page_icon="👋",
+    menu_items={
+        'Get Help': 'https://www.extremelycoolapp.com/help',
+        'Report a bug': "https://www.extremelycoolapp.com/bug",
+        'About': "# This is a header. This is an *extremely* cool app!"
+    }
 )
+header()
+
+st.sidebar.success("Select a viewer above.")
 
 st.markdown("# Welcome to Aviator Toolbox! 👋")
 st.markdown(
@@ -19,4 +24,3 @@ st.markdown(
     Github [source](https://github.com/ss-zheng/faa-view)
     """
 )
-st.sidebar.success("Select a viewer above.")

@@ -1,7 +1,43 @@
+from utils.data_loader import run_query, create_table, insert_rows_json
+from yaml.loader import SafeLoader
+from components.wishlist import WishList
 import streamlit as st
 import streamlit_authenticator as stauth
 import yaml
-from yaml.loader import SafeLoader
+
+@st.dialog("Wishlist")
+def wishlist_dialog():
+    wishlist = WishList()
+
+    if 'wishlist' not in st.session_state:
+        st.session_state['wishlist'] = []
+
+    # query for the wishlist
+    st.session_state['wishlist'] = wishlist.get_wishlist(st.session_state['username'])
+    if len(st.session_state['wishlist']) == 0:
+        st.write("No search term set yet")
+    else:
+        st.write("Toggle to remove:")
+        for idx, term in enumerate(st.session_state["wishlist"]):
+            doc_id = term['doc_id']
+            on = st.toggle(label=term['search_term'], value=True, key=idx)
+            if not on:
+                st.warning(f"Removing search term {term['search_term']}")
+                wishlist.remove_item(doc_id)
+                st.rerun(scope="fragment")
+    
+    # adding new search term (inserting to the bq table)
+    new_search_term = st.text_input(
+        "Add search term",
+        value="",
+        placeholder="part3",
+        key="new_search_term"
+        )
+    if new_search_term:
+        st.info(f"Inserting {new_search_term} to the database")
+        wishlist.insert_item(username=st.session_state["username"], search_term=new_search_term)
+        del st.session_state["new_search_term"]
+        st.rerun(scope="fragment")
 
 with open('auth_config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
@@ -9,13 +45,6 @@ with open('auth_config.yaml') as file:
 # Pre-hashing all plain text passwords once
 # stauth.Hasher.hash_passwords(config['credentials'])
 
-@st.dialog("Wishlist")
-def wishlist_dialog():
-    st.write("part1")
-    st.write("part2")
-    new_search_term = st.text_input("Add search term", placeholder="part3")
-    if new_search_term:
-        st.info(f"Inserting {new_search_term} to the database")
 
 @st.dialog("Auth")
 def login_dialog():
