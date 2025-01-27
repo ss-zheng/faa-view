@@ -1,6 +1,8 @@
 from google.cloud import firestore
 from datetime import datetime
 from pydantic import BaseModel, Field
+from google.oauth2 import service_account
+import streamlit as st
 from uuid import UUID
 from uuid import uuid4
 
@@ -38,7 +40,12 @@ class WishlistModel(BaseModel):
 class WishList:
     def __init__(self):
         # self.db = firestore.Client()
-        self.db = firestore.Client.from_service_account_json("firestore-key.json")
+        # self.db = firestore.Client.from_service_account_json("firestore-key.json")
+
+        credentials = service_account.Credentials.from_service_account_info(
+            st.secrets["firestore_service_account"]
+        )
+        self.db = firestore.Client(credentials=credentials)
         self.collection = 'wishlist'
 
     def get_wishlist(self, username: str):
