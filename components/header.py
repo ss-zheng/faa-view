@@ -1,9 +1,7 @@
-from utils.data_loader import run_query, create_table, insert_rows_json
-from yaml.loader import SafeLoader
 from components.wishlist import WishList
+from utils.data_loader import load_yaml
 import streamlit as st
 import streamlit_authenticator as stauth
-import yaml
 
 @st.dialog("Wishlist")
 def wishlist_dialog():
@@ -38,13 +36,6 @@ def wishlist_dialog():
         wishlist.insert_item(username=st.session_state["username"], search_term=new_search_term)
         del st.session_state["new_search_term"]
         st.rerun(scope="fragment")
-
-with open('auth_config.yaml') as file:
-    config = yaml.load(file, Loader=SafeLoader)
-
-# Pre-hashing all plain text passwords once
-# stauth.Hasher.hash_passwords(config['credentials'])
-
 
 @st.dialog("Auth")
 def login_dialog():
@@ -86,9 +77,6 @@ def login_dialog():
         #     st.error(e)
     
     if st.session_state['authentication_status']:
-        # authenticator.logout()
-        # authenticator.logout(location='sidebar') # cannot write to outside container
-        # st.toast(f'Welcome *{st.session_state["name"]}*', icon='😍')
         st.rerun()
     elif st.session_state['authentication_status'] is False:
         st.error('Username/password is incorrect')
@@ -97,30 +85,33 @@ def login_dialog():
 
 def header():
     # init the authenticator if not yet
+    if 'auth_config' not in st.session_state:
+        st.session_state['auth_config'] = load_yaml('auth_config.yaml')
+    # Pre-hashing all plain text passwords once
+    # stauth.Hasher.hash_passwords(config['credentials'])
+    config = st.session_state['auth_config']
     if "authenticator" not in st.session_state:
         authenticator = stauth.Authenticate(
             config['credentials'],
             config['cookie']['name'],
             config['cookie']['key'],
-            config['cookie']['expiry_days']
+            config['cookie']['expiry_days'],
+            auto_hash=False,
         )
         st.session_state.authenticator = authenticator
     if st.session_state['authentication_status'] is None:
-        st.sidebar.write("STATUS NONE")
+        # st.sidebar.write("STATUS NONE")
         st.sidebar.button("Login", on_click=login_dialog)
-        # name, authentication_status, username = st.session_state.authenticator.login(location='sidebar')
     elif st.session_state['authentication_status'] is False:
-        st.sidebar.write("STATUS FALSE")
+        # st.sidebar.write("STATUS FALSE")
         if st.session_state["name"]:
             st.toast(f'*{st.session_state["name"]}* signed out', icon='😍')
         st.sidebar.button("Login", on_click=login_dialog)
     elif st.session_state['authentication_status'] is True:
-        st.sidebar.write("STATUS TRUE")
+        # st.sidebar.write("STATUS TRUE")
         if "admin" in st.session_state["roles"]:
             st.sidebar.write(st.session_state)
         st.session_state.authenticator.logout(location='sidebar')
-        # st.session_state.authenticator.logout(location='sidebar', callback=logout)
-        # st.toast(f'Welcome *{st.session_state["name"]}*', icon='😍')
 
     if st.session_state['authentication_status'] is True:
         st.toast(f'Welcome *{st.session_state["name"]}*', icon='😍')

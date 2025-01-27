@@ -39,9 +39,6 @@ class WishlistModel(BaseModel):
 
 class WishList:
     def __init__(self):
-        # self.db = firestore.Client()
-        # self.db = firestore.Client.from_service_account_json("firestore-key.json")
-
         credentials = service_account.Credentials.from_service_account_info(
             st.secrets["firestore_service_account"]
         )

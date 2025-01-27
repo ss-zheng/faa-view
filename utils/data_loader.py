@@ -2,7 +2,9 @@ import pandas as pd
 import streamlit as st
 from st_files_connection import FilesConnection
 from google.oauth2 import service_account
+from yaml.loader import SafeLoader
 from google.cloud import bigquery
+import yaml
 import os
 
 def load_df(filename, usecols=None):
@@ -17,6 +19,21 @@ def load_df(filename, usecols=None):
             file_path = os.path.join("faa-viewer-bucket/ReleasableAircraft", filename)
             df = conn.read(file_path, input_format="csv", usecols=usecols, ttl=600) # ttl controls cache time
         return df
+    except FileNotFoundError as e:
+        raise e
+
+def load_yaml(filename):
+    try:
+        if os.path.isfile(filename):
+            with open(filename) as file:
+                config = yaml.load(file, Loader=SafeLoader)
+        else:
+            # Create connection object and retrieve file contents.
+            conn = st.connection('gcs', type=FilesConnection)
+            file_path = os.path.join("faa-viewer-bucket", filename)
+            with conn.open(file_path, "r") as file:
+                config = yaml.load(file, Loader=SafeLoader)
+        return config
     except FileNotFoundError as e:
         raise e
 
