@@ -48,7 +48,7 @@ class WishList:
 
     def get_wishlist(self, username: str):
         collection_ref = self.db.collection(self.collection)
-        query = collection_ref.where(firestore.FieldFilter('username', '==', username))
+        query = collection_ref.where(filter=firestore.FieldFilter('username', '==', username))
         # Execute the query and fetch results
         results = query.stream()
         # Process the documents
