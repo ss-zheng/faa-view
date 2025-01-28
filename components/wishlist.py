@@ -40,14 +40,15 @@ class WishlistModel(BaseModel):
 class WishList:
     def __init__(self):
         credentials = service_account.Credentials.from_service_account_info(
-            st.secrets["firestore_service_account"]
+            st.secrets["gcp_service_account"]
         )
-        self.db = firestore.Client(credentials=credentials)
+
+        self.db = firestore.Client(credentials=credentials, database='pilotkits')
         self.collection = 'wishlist'
 
     def get_wishlist(self, username: str):
         collection_ref = self.db.collection(self.collection)
-        query = collection_ref.where('username', '==', username)
+        query = collection_ref.where(firestore.FieldFilter('username', '==', username))
         # Execute the query and fetch results
         results = query.stream()
         # Process the documents
